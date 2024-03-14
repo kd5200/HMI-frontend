@@ -1,11 +1,13 @@
 /* eslint-disable no-unused-vars */
 // import logo from "./logo.svg";
 import "./App.css";
-import MyComponent from "./components/fetch";
+import WeatherForm from "./components/WeatherForm";
+
 function App() {
   return (
     <>
-      <MyComponent />
+      {/* <MyComponent /> */}
+      <WeatherForm />
     </>
   );
 }
