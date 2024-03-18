@@ -1,26 +1,28 @@
 import React, { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import { faSun } from "@fortawesome/free-solid-svg-icons";
-import { Card } from "tw-elements";
 
 const WeatherForm2 = () => {
   const [weatherCondition, setWeatherCondition] = useState("");
   const [matchingData, setMatchingData] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/cities_states_by_weather/?weather_condition=${weatherCondition}`
+        `http://ec2-54-87-138-50.compute-1.amazonaws.com:8000/cities_states_by_weather/?weather_condition=${weatherCondition}`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch data");
       }
       const data = await response.json();
       setMatchingData(data.matching_data);
+      setErrorMessage("");
     } catch (error) {
       console.error(error);
+      setErrorMessage(
+        "Invalid weather condition. Please choose from: Thunderstorm, Drizzle, Rain, Snow, Atmosphere, Clear, Clouds"
+      ); // Set error message
     }
   };
 
@@ -59,7 +61,6 @@ const WeatherForm2 = () => {
               type="submit"
               className="bg-transparent text-white py-2 px-4 rounded hover:bg-gray-600 border border-pink-600"
             >
-              <FontAwesomeIcon icon="fa-solid fa-cloud-sun-rain" />
               Submit
             </button>
           </form>
@@ -69,7 +70,10 @@ const WeatherForm2 = () => {
         <h2 className="text-xl font-semibold mb-2 dark:text-white">
           Cities experiencing the condition given:
         </h2>
-        <ul class="w-96 text-surface dark:text-white">
+        {errorMessage && (
+          <p className="text-white font-semibold">{errorMessage}</p>
+        )}
+        <ul className="w-96 text-surface dark:text-white">
           {matchingData.map((item, index) => (
             <li
               key={index}
@@ -83,7 +87,9 @@ const WeatherForm2 = () => {
                   <p className="font-semibold">
                     Temperature: {item.Temperature_Fahrenheit} &deg;F
                   </p>
-                  <p className="font-semibold">Wind Speed: {item.Wind_Speed}</p>
+                  <p className="font-semibold">
+                    Wind Speed: {item.Wind_Speed} mph
+                  </p>
                 </div>
               </div>
             </li>
