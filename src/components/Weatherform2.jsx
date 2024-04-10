@@ -4,13 +4,15 @@ const WeatherForm2 = () => {
   const [weatherCondition, setWeatherCondition] = useState("");
   const [matchingData, setMatchingData] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false); // New state for loading
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setLoading(true);
 
     try {
       const response = await fetch(
-        `http://ec2-54-87-138-50.compute-1.amazonaws.com:8000/cities_states_by_weather/?weather_condition=${weatherCondition}`
+        `http://127.0.0.1:8000/cities_states_by_weather/?weather_condition=${weatherCondition}`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch data");
@@ -23,6 +25,8 @@ const WeatherForm2 = () => {
       setErrorMessage(
         "Invalid weather condition. Please choose from: Thunderstorm, Drizzle, Rain, Snow, Atmosphere, Clear, Clouds"
       ); // Set error message
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -66,35 +70,42 @@ const WeatherForm2 = () => {
           </form>
         </div>
       </div>
+
       <div>
-        <h2 className="text-xl font-semibold mb-2 dark:text-white">
-          Cities experiencing the condition given:
-        </h2>
-        {errorMessage && (
-          <p className="text-white font-semibold">{errorMessage}</p>
+        {loading ? ( // Conditionally render loading state
+          <p className="text-white font-semibold">Loading...</p>
+        ) : (
+          <>
+            <h2 className="text-xl font-semibold mb-2 dark:text-white">
+              Cities experiencing the condition given:
+            </h2>
+            {errorMessage && (
+              <p className="text-white font-semibold">{errorMessage}</p>
+            )}
+            <ul className="w-96 text-surface dark:text-white">
+              {matchingData.map((item, index) => (
+                <li
+                  key={index}
+                  className="mb-4"
+                  class="w-full border-b-2 border-neutral-100 py-4 dark:border-white"
+                >
+                  <div className="flex">
+                    <div>
+                      <span className="font-semibold"> {item.City}</span>
+                      <span className="font-semibold">, {item.State}</span>
+                      <p className="font-semibold">
+                        Temperature: {item.Temperature_Fahrenheit} &deg;F
+                      </p>
+                      <p className="font-semibold">
+                        Wind Speed: {item.Wind_Speed} mph
+                      </p>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </>
         )}
-        <ul className="w-96 text-surface dark:text-white">
-          {matchingData.map((item, index) => (
-            <li
-              key={index}
-              className="mb-4"
-              class="w-full border-b-2 border-neutral-100 py-4 dark:border-white"
-            >
-              <div className="flex">
-                <div>
-                  <span className="font-semibold"> {item.City}</span>
-                  <span className="font-semibold">, {item.State}</span>
-                  <p className="font-semibold">
-                    Temperature: {item.Temperature_Fahrenheit} &deg;F
-                  </p>
-                  <p className="font-semibold">
-                    Wind Speed: {item.Wind_Speed} mph
-                  </p>
-                </div>
-              </div>
-            </li>
-          ))}
-        </ul>
       </div>
     </div>
   );
